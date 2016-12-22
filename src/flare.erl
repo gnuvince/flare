@@ -13,6 +13,8 @@
     receive_response/2
 ]).
 
+-define(TOPIC_BUFFER_BACKLOG_SIZE, 1000000000).
+
 %% public
 -spec async_produce(topic_name(), msg()) ->
     {ok, req_id()} | {error, atom()}.
@@ -26,9 +28,16 @@ async_produce(Topic, Message) ->
 async_produce(Topic, Message, Pid) ->
     case flare_topic:server(Topic) of
         {ok, Server} ->
-            ReqId = {os:timestamp(), self()},
-            Server ! {produce, ReqId, Message, Pid},
-            {ok, ReqId};
+            Size = size(Message),
+            case shackle_backlog:check(Server, ?TOPIC_BUFFER_BACKLOG_SIZE,
+                    Size) of
+                true ->
+                    ReqId = {os:timestamp(), self()},
+                    Server ! {produce, ReqId, Message, Size, Pid},
+                    {ok, ReqId};
+                false ->
+                    {error, backlog_full}
+            end;
         {error, Reason} ->
             {error, Reason}
     end.

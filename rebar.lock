@@ -4,7 +4,7 @@
   1},
  {<<"shackle">>,
   {git,"https://github.com/lpgauth/shackle.git",
-       {ref,"14c50629f285f25991ba4fb91177838701a7b815"}},
+       {ref,"82f41e4f756fbdaab472645d4221e4cbc49328f3"}},
   0},
  {<<"snappy">>,
   {git,"https://github.com/lpgauth/snappy-erlang-nif.git",
